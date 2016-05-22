@@ -12,7 +12,9 @@
         </h1>
 
         <div class="links">
-            {% if current_user %}
+            {% if current_username %}
+                Logged in as {{current_username}}
+                <br>
                 <a href="/blog/logout">Logout</a>
                 <a href="/blog">View Posts</a>
                 <a href="/blog/newpost">New Post</a>

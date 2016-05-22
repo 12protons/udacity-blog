@@ -36,7 +36,13 @@ class BlogHandler(webapp2.RequestHandler):
         return t.render(params)
 
     def render(self, template, **kw):
-        kw['current_user'] = self.logged_in()
+        current_user_id = self.logged_in()
+        if current_user_id:
+            user = models.User.get_by_id(int(current_user_id))
+            current_username = user.username
+
+            kw['current_user_id'] = current_user_id
+            kw['current_username'] = current_username
         self.write(self.render_str(template, **kw))
 
     def write_cookie(self, cookie_name, cookie_value):

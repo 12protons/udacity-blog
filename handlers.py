@@ -108,8 +108,8 @@ class NewPostHandler(blog.BlogHandler):
             self.render_newblog(subject=subject, content=content, error=error)
 
 class PostHandler(blog.BlogHandler):
-    def render_post(self, subject="", content="", authorname=""):
-        self.render("post.html", subject=subject, content=content, authorname=authorname)
+    def render_post(self, subject, content, authorname, error=""):
+        self.render("post.html", subject=subject, content=content, authorname=authorname, error=error)
 
     def get(self, post_id):
         post = models.Post.get_by_id(int(post_id))
@@ -120,6 +120,27 @@ class PostHandler(blog.BlogHandler):
         author = models.User.get_by_id(int(author_id))
 
         self.render_post(subject=subject, content=content, authorname=author.username)
+
+    def post(self, post_id):
+        self.redirect_if_not_logged_in()
+
+        user_id = self.logged_in()
+        comment_content = self.request.get("comment")
+        if comment_content:
+            comment = models.Comment(user_id=user_id, post_id=post_id, content=comment_content)
+            comment.put()
+            self.redirect("/blog/%s" % post_id)
+        else:
+            error = "You cant submit empty comments!"
+
+            post = models.Post.get_by_id(int(post_id))
+            subject = post.subject
+            content = post.content
+            
+            author_id = post.author
+            author = models.User.get_by_id(int(author_id))
+
+            self.render_post(subject=subject, content=content, authorname=author.username, error=error)
 
 class HomeHandler(blog.BlogHandler):
     def render_blog(self, posts):
@@ -151,7 +172,6 @@ class EditPostHandler(blog.BlogHandler):
         content = self.request.get("content")
 
         if subject and content:
-
             post = models.Post.get_by_id(int(post_id))
             post.subject = subject
             post.content = content

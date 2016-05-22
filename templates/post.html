@@ -15,25 +15,29 @@
     </pre>
 </div>
 
-<div class="comment-form">
-    <form method="post">
-        <label>
-            <div>Add Comment</div>
-            <input type="text" name="comment" value="{{comment}}">
-        </label>
 
-        <div class="error">
-            {{error}}
-        </div>
+{% if current_username %}
+    <div class="comment-form">
+        <form method="post">
+            <label>
+                <div>Add Comment</div>
+                <input type="text" name="comment" value="{{comment}}">
+            </label>
 
-        <input type="submit">
-    </form>
-</div>
+            <div class="error">
+                {{error}}
+            </div>
+
+            <input type="submit">
+        </form>
+    </div>
+{% endif %}
+
 
 {% for comment in comments %}
     <div class="comments">
         <div class="comment">
-            {{comment.body}}
+            {{comment.content}}
         </div>
 
         {% if comment.author == current_user %}
