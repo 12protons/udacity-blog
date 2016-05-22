@@ -10,6 +10,15 @@
             Welcome to my blog!
         </h1>
 
+        {% if user_is_logged_in %}
+            <a href="/blog/logout">Logout</a>
+            <a href="/blog">View Posts</a>
+            <a href="/blog/newpost">New Post</a>
+        {% else %}
+            <a href="/blog/signup">Sign up</a>
+            <a href="/blog/login">Log in</a>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
     </body>
