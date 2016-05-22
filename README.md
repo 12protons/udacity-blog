@@ -4,6 +4,23 @@ Note: This blog is currently hosted at the following link:
 
 http://my-blog-1318.appspot.com/blog
 
+### How to run locally
+
+First, ensure Python and GoogleAppEngine are both installed.
+
+- https://www.python.org/download/releases/2.7.4/
+- https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python
+
+Also, ensure that the python executable, and dev_appserver.py (from Google App Engine) are on your PATH.
+
+To run the blog server locally, run the following command from this directory:
+
+    dev_appserver.py .
+
+Then go to the following url:
+
+http://localhost:8080/blog
+
 ### How to use
 
 ##### Accounts
