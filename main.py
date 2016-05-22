@@ -12,4 +12,5 @@ app = webapp2.WSGIApplication([
     ('/blog/logout', handlers.LogoutHandler),
     ('/blog/login', handlers.LoginHandler),
     ('/blog/edit/(\d+)', handlers.EditPostHandler),
+    ('/blog/delete/(\d+)', handlers.DeletePostHandler)
 ], debug=True)

@@ -4,6 +4,7 @@ import jinja2
 import random
 import string
 import hmac
+import models
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -67,3 +68,9 @@ class BlogHandler(webapp2.RequestHandler):
     def redirect_if_not_logged_in(self):
         if not self.logged_in():
             self.redirect('/blog/signup')
+
+    def redirect_if_not_owned(self, post_id):
+        user_id = self.logged_in()
+        post = models.Post.get_by_id(int(post_id))
+        if post.author != user_id:
+            self.redirect("/blog/%s" % post_id)

@@ -133,13 +133,6 @@ class EditPostHandler(blog.BlogHandler):
     def render_edit(self, post_id, subject, content, error=""):
         self.render("editpost.html", post_id=post_id, subject=subject, content=content, error=error)
 
-    def redirect_if_not_owned(self, post_id):
-        user_id = self.logged_in()
-        post = models.Post.get_by_id(int(post_id))
-        if post.author != user_id:
-            self.redirect("/blog/%s" % post_id)
-
-
     def get(self, post_id):
         self.redirect_if_not_logged_in()
         self.redirect_if_not_owned(post_id)
@@ -168,3 +161,11 @@ class EditPostHandler(blog.BlogHandler):
         else:
             error = "need both subject and content!"
             self.render_edit(post_id=post_id, subject=subject, content=content, error=error)
+
+class DeletePostHandler(blog.BlogHandler):
+    def get(self, post_id):
+        self.redirect_if_not_logged_in()
+        self.redirect_if_not_owned(post_id)
+        post = models.Post.get_by_id(int(post_id))
+        db.delete(post)
+        self.redirect("/blog")
