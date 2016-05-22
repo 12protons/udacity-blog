@@ -46,7 +46,8 @@ class BlogHandler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
     def write_cookie(self, cookie_name, cookie_value):
-        cookie_value = make_secure_val(cookie_value)
+        if cookie_value:
+            cookie_value = make_secure_val(cookie_value)
         self.response.headers.add_header('Set-Cookie', '%s=%s; Path=/' % (cookie_name, cookie_value))
 
     def read_cookie(self, cookie_name):
