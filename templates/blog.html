@@ -13,7 +13,7 @@
 
         {% if post.author == current_user %}
         <div class="post-edit-link">
-            <a href="/blog/edit/{{post.id}}">Edit</a>
+            <a href="/blog/edit/{{post.key().id()}}">Edit</a>
         </div>
         {% endif %}
     </div>

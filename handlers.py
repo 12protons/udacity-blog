@@ -122,9 +122,49 @@ class PostHandler(blog.BlogHandler):
         self.render_post(subject=subject, content=content, authorname=author.username)
 
 class HomeHandler(blog.BlogHandler):
-    def render_blog(self):
-        posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC")
+    def render_blog(self, posts):
         self.render("blog.html", posts=posts)
 
     def get(self):
-        self.render_blog()
+        posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC")
+        self.render_blog(posts)
+
+class EditPostHandler(blog.BlogHandler):
+    def render_edit(self, post_id, subject, content):
+        self.render("editpost.html", post_id=post_id, subject=subject, content=content)
+
+    def redirect_if_not_owned(self, post_id):
+        user_id = self.logged_in()
+        post = models.Post.get_by_id(int(post_id))
+        if post.author != user_id:
+            self.redirect("/blog/%s" % post_id)
+
+
+    def get(self, post_id):
+        self.redirect_if_not_logged_in()
+        self.redirect_if_not_owned(post_id)
+
+        post = models.Post.get_by_id(int(post_id))
+        subject = post.subject
+        content = post.content
+
+        self.render_edit(post_id=post_id, subject=subject, content=content)
+
+    def post(self, post_id):
+        self.redirect_if_not_logged_in()
+        self.redirect_if_not_owned(post_id)
+
+        subject = self.request.get("subject")
+        content = self.request.get("content")
+
+        if subject and content:
+
+            post = models.Post.get_by_id(int(post_id))
+            post.subject = subject
+            post.content = content
+            post.put()
+
+            self.redirect("/blog/%s" % post_id)
+        else:
+            error = "need both subject and content!"
+            self.render_newblog(subject=subject, content=content, error=error)
