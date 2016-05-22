@@ -11,15 +11,17 @@
             Welcome to my blog!
         </h1>
 
-        {% if current_user %}
-            <a href="/blog/logout">Logout</a>
-            <a href="/blog">View Posts</a>
-            <a href="/blog/newpost">New Post</a>
-        {% else %}
-            <a href="/blog">View Posts</a>
-            <a href="/blog/signup">Sign up</a>
-            <a href="/blog/login">Log in</a>
-        {% endif %}
+        <div class="links">
+            {% if current_user %}
+                <a href="/blog/logout">Logout</a>
+                <a href="/blog">View Posts</a>
+                <a href="/blog/newpost">New Post</a>
+            {% else %}
+                <a href="/blog">View Posts</a>
+                <a href="/blog/signup">Sign up</a>
+                <a href="/blog/login">Log in</a>
+            {% endif %}
+        </div>
 
         {% block content %}
         {% endblock %}

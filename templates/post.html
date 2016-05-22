@@ -1,16 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="post-author">
-    {{authorname}}
+<div class="post">
+    <div class="post-author">
+        Author: {{authorname}}
+    </div>
+
+    <div class="post-subject">
+        {{subject}}
+    </div>
+
+    <pre class="post-content">
+        {{content}}
+    </pre>
 </div>
 
-<div class="post-subject">
-    {{subject}}
+<div class="comment-form">
+    <form method="post">
+        <label>
+            <div>Add Comment</div>
+            <input type="text" name="comment" value="{{comment}}">
+        </label>
+
+        <div class="error">
+            {{error}}
+        </div>
+
+        <input type="submit">
+    </form>
 </div>
 
-<pre class="post-content">
-    {{content}}
-</pre>
+{% for comment in comments %}
+    <div class="comments">
+        <div class="comment">
+            {{comment.body}}
+        </div>
+
+        {% if comment.author == current_user %}
+            <div class="comment-edit-link">
+                <a href="/blog/editcomment/{{comment.key().id()}}">Edit</a>
+                <a href="/blog/deletecomment/{{comment.key().id()}}">Delete</a>
+            </div>
+        {% endif %}
+    </div>
+
+{% endfor %}
 
 {% endblock %}

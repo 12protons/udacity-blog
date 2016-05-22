@@ -1,4 +1,4 @@
-.posts {
+.post {
     margin-top: 15px;
     margin-bottom: 15px;
     border-style: solid;
@@ -7,4 +7,16 @@
     padding-right: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
+}
+
+.links {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-style: solid;
+    border-width: 1px;
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    background-color: #dff;
 }
