@@ -67,7 +67,7 @@ class BlogHandler(webapp2.RequestHandler):
 
     def redirect_if_not_logged_in(self):
         if not self.logged_in():
-            self.redirect('/blog/signup')
+            self.redirect('/blog/login')
 
     def redirect_if_not_owned(self, post_id):
         user_id = self.logged_in()

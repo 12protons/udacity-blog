@@ -79,7 +79,7 @@ class LoginHandler(blog.BlogHandler):
 class LogoutHandler(blog.BlogHandler):
     def get(self):
         self.write_cookie("name", "")
-        self.redirect("/blog/signup")
+        self.redirect("/blog/login")
 
 class NewPostHandler(blog.BlogHandler):
     def render_newblog(self, subject="", content="", error=""):
