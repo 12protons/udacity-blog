@@ -15,4 +15,4 @@ class User(db.Model):
 class Comment(db.Model):
     user_id = db.StringProperty(required = True)
     post_id = db.StringProperty(required = True)
-    content = db.StringProperty(required = True)
+    content = db.TextProperty(required = True)
