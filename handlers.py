@@ -222,6 +222,36 @@ class LikePostHandler(blog.BlogHandler):
 
         self.redirect("/blog")
 
+class EditCommentHandler(blog.BlogHandler):
+    def render_edit(self, post_id, comment_id, content, error=""):
+        self.render("editcomment.html", post_id=post_id, comment_id=comment_id, content=content, error=error)
+
+    def get(self, post_id, comment_id):
+        redirected = self.redirect_if_not_logged_in()
+        redirected &= self.redirect_if_comment_not_owned(post_id, comment_id)
+        if redirected:
+            return
+
+        comment = models.Comment.get_by_id(int(comment_id))
+        self.render_edit(post_id, comment_id, comment.content)
+
+    def post(self, post_id, comment_id):
+        redirected = self.redirect_if_not_logged_in()
+        redirected &= self.redirect_if_comment_not_owned(post_id, comment_id)
+        if redirected:
+            return
+
+        content = self.request.get("content")
+
+        if content:
+            comment = models.Comment.get_by_id(int(comment_id))
+            comment.content = content
+            comment.put()
+            self.redirect("/blog/%s" % post_id)
+        else:
+            error="You cant have empty comments!"
+            self.render_edit(post_id, comment_id, comment.content)
+
 class DeleteCommentHandler(blog.BlogHandler):
     def get(self, post_id, comment_id):
         redirected = self.redirect_if_not_logged_in()

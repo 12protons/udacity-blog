@@ -14,5 +14,6 @@ app = webapp2.WSGIApplication([
     ('/blog/edit/(\d+)', handlers.EditPostHandler),
     ('/blog/delete/(\d+)', handlers.DeletePostHandler),
     ('/blog/like/(\d+)', handlers.LikePostHandler),
+    ('/blog/(\d+)/editcomment/(\d+)', handlers.EditCommentHandler),
     ('/blog/(\d+)/deletecomment/(\d+)', handlers.DeleteCommentHandler)
 ], debug=True)
