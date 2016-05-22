@@ -43,7 +43,9 @@ class WelcomeHandler(blog.BlogHandler):
         self.render("welcome.html", username=username)
 
     def get(self):
-        self.redirect_if_not_logged_in()
+        redirected = self.redirect_if_not_logged_in()
+        if redirected:
+            return
 
         user_id = self.read_cookie('name')
         username = models.User.get_by_id(int(user_id)).username
@@ -86,11 +88,16 @@ class NewPostHandler(blog.BlogHandler):
         self.render("newpost.html", subject=subject, content=content, error=error)
 
     def get(self):
-        self.redirect_if_not_logged_in()
+        redirected = self.redirect_if_not_logged_in()
+        if redirected:
+            return
+
         self.render_newblog()
 
     def post(self):
-        self.redirect_if_not_logged_in()
+        redirected = self.redirect_if_not_logged_in()
+        if redirected:
+            return
 
         subject = self.request.get("subject")
         content = self.request.get("content")
@@ -108,8 +115,8 @@ class NewPostHandler(blog.BlogHandler):
             self.render_newblog(subject=subject, content=content, error=error)
 
 class PostHandler(blog.BlogHandler):
-    def render_post(self, subject, content, authorname, comments, error=""):
-        self.render("post.html", subject=subject, content=content, authorname=authorname, comments=comments, error=error)
+    def render_post(self, post_id, subject, content, authorname, comments, error=""):
+        self.render("post.html", post_id=post_id, subject=subject, content=content, authorname=authorname, comments=comments, error=error)
 
     def get(self, post_id):
         post = models.Post.get_by_id(int(post_id))
@@ -121,10 +128,12 @@ class PostHandler(blog.BlogHandler):
 
         comments = db.GqlQuery("SELECT * FROM Comment WHERE post_id = :1", post_id)
 
-        self.render_post(subject=subject, content=content, comments=comments, authorname=author.username)
+        self.render_post(post_id=post_id, subject=subject, content=content, comments=comments, authorname=author.username)
 
     def post(self, post_id):
-        self.redirect_if_not_logged_in()
+        redirected = self.redirect_if_not_logged_in()
+        if redirected:
+            return
 
         user_id = self.logged_in()
         comment_content = self.request.get("comment")
@@ -157,8 +166,10 @@ class EditPostHandler(blog.BlogHandler):
         self.render("editpost.html", post_id=post_id, subject=subject, content=content, error=error)
 
     def get(self, post_id):
-        self.redirect_if_not_logged_in()
-        self.redirect_if_not_owned(post_id)
+        redirected = self.redirect_if_not_logged_in()
+        redirected &= self.redirect_if_not_owned(post_id)
+        if redirected:
+            return
 
         post = models.Post.get_by_id(int(post_id))
         subject = post.subject
@@ -167,8 +178,10 @@ class EditPostHandler(blog.BlogHandler):
         self.render_edit(post_id=post_id, subject=subject, content=content)
 
     def post(self, post_id):
-        self.redirect_if_not_logged_in()
-        self.redirect_if_not_owned(post_id)
+        redirected = self.redirect_if_not_logged_in()
+        redirected &= self.redirect_if_not_owned(post_id)
+        if redirected:
+            return
 
         subject = self.request.get("subject")
         content = self.request.get("content")
@@ -186,8 +199,10 @@ class EditPostHandler(blog.BlogHandler):
 
 class DeletePostHandler(blog.BlogHandler):
     def get(self, post_id):
-        self.redirect_if_not_logged_in()
-        self.redirect_if_not_owned(post_id)
+        redirected = self.redirect_if_not_logged_in()
+        redirected &= self.redirect_if_not_owned(post_id)
+        if redirected:
+            return
 
         post = models.Post.get_by_id(int(post_id))
         db.delete(post)
@@ -195,7 +210,9 @@ class DeletePostHandler(blog.BlogHandler):
 
 class LikePostHandler(blog.BlogHandler):
     def get(self, post_id):
-        self.redirect_if_not_logged_in()
+        redirected = self.redirect_if_not_logged_in()
+        if redirected:
+            return
 
         user_id = str(self.logged_in())
         post = models.Post.get_by_id(int(post_id))
@@ -204,3 +221,14 @@ class LikePostHandler(blog.BlogHandler):
             post.put()
 
         self.redirect("/blog")
+
+class DeleteCommentHandler(blog.BlogHandler):
+    def get(self, post_id, comment_id):
+        redirected = self.redirect_if_not_logged_in()
+        redirected &= self.redirect_if_comment_not_owned(post_id, comment_id)
+        if redirected:
+            return
+
+        comment = models.Comment.get_by_id(int(comment_id))
+        db.delete(comment)
+        self.redirect("/blog/%s" % post_id)

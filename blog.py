@@ -74,9 +74,21 @@ class BlogHandler(webapp2.RequestHandler):
     def redirect_if_not_logged_in(self):
         if not self.logged_in():
             self.redirect('/blog/login')
+            return True
+        return False
 
     def redirect_if_not_owned(self, post_id):
         user_id = self.logged_in()
         post = models.Post.get_by_id(int(post_id))
         if post.author != user_id:
             self.redirect("/blog/%s" % post_id)
+            return True
+        return False
+
+    def redirect_if_comment_not_owned(self, post_id, comment_id):
+        user_id = self.logged_in()
+        comment = models.Comment.get_by_id(int(comment_id))
+        if comment.user_id != user_id:
+            self.redirect("/blog/%s" % post_id)
+            return True
+        return False

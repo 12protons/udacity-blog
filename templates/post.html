@@ -21,10 +21,10 @@
             {{comment.content}}
         </div>
 
-        {% if comment.author == current_user %}
+        {% if comment.user_id == current_user_id %}
             <div class="comment-edit-link">
-                <a href="/blog/editcomment/{{comment.key().id()}}">Edit</a>
-                <a href="/blog/deletecomment/{{comment.key().id()}}">Delete</a>
+                <a href="/blog/{{post_id}}/editcomment/{{comment.key().id()}}">Edit</a>
+                <a href="/blog/{{post_id}}/deletecomment/{{comment.key().id()}}">Delete</a>
             </div>
         {% endif %}
     </div>
