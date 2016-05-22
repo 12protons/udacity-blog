@@ -4,7 +4,7 @@ class Post(db.Model):
     subject = db.StringProperty(required = True)
     content = db.TextProperty(required = True)
     author = db.StringProperty(required = True)
-    #liked_by_users = db.StringProperty(required = True)
+    liked_by_users = db.StringProperty()
     created = db.DateTimeProperty(auto_now_add = True)
 
 class User(db.Model):

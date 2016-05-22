@@ -97,7 +97,7 @@ class NewPostHandler(blog.BlogHandler):
         author_id = self.logged_in()
 
         if subject and content:
-            a = models.Post(subject = subject, content = content, author = author_id)
+            a = models.Post(subject=subject, content=content, author=author_id, liked_by_users="")
             a.put()
 
             post_id = a.key().id()
@@ -166,6 +166,19 @@ class DeletePostHandler(blog.BlogHandler):
     def get(self, post_id):
         self.redirect_if_not_logged_in()
         self.redirect_if_not_owned(post_id)
+
         post = models.Post.get_by_id(int(post_id))
         db.delete(post)
+        self.redirect("/blog")
+
+class LikePostHandler(blog.BlogHandler):
+    def get(self, post_id):
+        self.redirect_if_not_logged_in()
+
+        user_id = str(self.logged_in())
+        post = models.Post.get_by_id(int(post_id))
+        if post.author != user_id and user_id not in post.liked_by_users:
+            post.liked_by_users += "|" + user_id
+            post.put()
+
         self.redirect("/blog")

@@ -11,10 +11,18 @@
             {{post.content}}
         </pre>
 
+        <div class="likes">
+            {{post.liked_by_users.count("|")}} Likes
+        </div>
+
         {% if post.author == current_user %}
         <div class="post-edit-link">
             <a href="/blog/edit/{{post.key().id()}}">Edit</a>
             <a href="/blog/delete/{{post.key().id()}}">Delete</a>
+        </div>
+        {% else %}
+        <div class="post-edit-link">
+            <a href="/blog/like/{{post.key().id()}}">Like</a>
         </div>
         {% endif %}
     </div>
