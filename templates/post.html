@@ -15,6 +15,20 @@
     </pre>
 </div>
 
+{% for comment in comments %}
+    <div class="comment">
+        <div class="comment-content">
+            {{comment.content}}
+        </div>
+
+        {% if comment.author == current_user %}
+            <div class="comment-edit-link">
+                <a href="/blog/editcomment/{{comment.key().id()}}">Edit</a>
+                <a href="/blog/deletecomment/{{comment.key().id()}}">Delete</a>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
 
 {% if current_username %}
     <div class="comment-form">
@@ -32,22 +46,5 @@
         </form>
     </div>
 {% endif %}
-
-
-{% for comment in comments %}
-    <div class="comments">
-        <div class="comment">
-            {{comment.content}}
-        </div>
-
-        {% if comment.author == current_user %}
-            <div class="comment-edit-link">
-                <a href="/blog/editcomment/{{comment.key().id()}}">Edit</a>
-                <a href="/blog/deletecomment/{{comment.key().id()}}">Delete</a>
-            </div>
-        {% endif %}
-    </div>
-
-{% endfor %}
 
 {% endblock %}

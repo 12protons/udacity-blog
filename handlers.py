@@ -108,8 +108,8 @@ class NewPostHandler(blog.BlogHandler):
             self.render_newblog(subject=subject, content=content, error=error)
 
 class PostHandler(blog.BlogHandler):
-    def render_post(self, subject, content, authorname, error=""):
-        self.render("post.html", subject=subject, content=content, authorname=authorname, error=error)
+    def render_post(self, subject, content, authorname, comments, error=""):
+        self.render("post.html", subject=subject, content=content, authorname=authorname, comments=comments, error=error)
 
     def get(self, post_id):
         post = models.Post.get_by_id(int(post_id))
@@ -119,7 +119,9 @@ class PostHandler(blog.BlogHandler):
         author_id = post.author
         author = models.User.get_by_id(int(author_id))
 
-        self.render_post(subject=subject, content=content, authorname=author.username)
+        comments = db.GqlQuery("SELECT * FROM Comment WHERE post_id = :1", post_id)
+
+        self.render_post(subject=subject, content=content, comments=comments, authorname=author.username)
 
     def post(self, post_id):
         self.redirect_if_not_logged_in()
