@@ -35,7 +35,7 @@ class BlogHandler(webapp2.RequestHandler):
         return t.render(params)
 
     def render(self, template, **kw):
-        kw['user_is_logged_in'] = self.logged_in()
+        kw['current_user'] = self.logged_in()
         self.write(self.render_str(template, **kw))
 
     def write_cookie(self, cookie_name, cookie_value):

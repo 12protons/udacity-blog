@@ -11,7 +11,7 @@
             Welcome to my blog!
         </h1>
 
-        {% if user_is_logged_in %}
+        {% if current_user %}
             <a href="/blog/logout">Logout</a>
             <a href="/blog">View Posts</a>
             <a href="/blog/newpost">New Post</a>

@@ -59,13 +59,17 @@ class LoginHandler(blog.BlogHandler):
     def post(self):
         username = self.request.get("username")
         password = self.request.get("password")
-        existing_user = db.GqlQuery("SELECT * FROM User WHERE username = :1", username)[0]
+        existing_users = db.GqlQuery("SELECT * FROM User WHERE username = :1", username)
 
-        if not existing_user:
+        if existing_users.count(1) == 0:
             self.render_login(error="No such user exists!")
+            return
+
+        existing_user = existing_users[0]
 
         if not self.validate_pw(name=username, pw=password, h=existing_user.password_hash):
             self.render_login(error="Invalid password!")
+            return
 
         user_id = str(existing_user.key().id())
         self.write_cookie("name", user_id)

@@ -10,6 +10,12 @@
         <pre class="post-content">
             {{post.content}}
         </pre>
+
+        {% if post.author == current_user %}
+        <div class="post-edit-link">
+            <a href="/blog/edit/{{post.id}}">Edit</a>
+        </div>
+        {% endif %}
     </div>
 
 {% endfor %}
