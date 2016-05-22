@@ -130,8 +130,8 @@ class HomeHandler(blog.BlogHandler):
         self.render_blog(posts)
 
 class EditPostHandler(blog.BlogHandler):
-    def render_edit(self, post_id, subject, content):
-        self.render("editpost.html", post_id=post_id, subject=subject, content=content)
+    def render_edit(self, post_id, subject, content, error=""):
+        self.render("editpost.html", post_id=post_id, subject=subject, content=content, error=error)
 
     def redirect_if_not_owned(self, post_id):
         user_id = self.logged_in()
@@ -167,4 +167,4 @@ class EditPostHandler(blog.BlogHandler):
             self.redirect("/blog/%s" % post_id)
         else:
             error = "need both subject and content!"
-            self.render_newblog(subject=subject, content=content, error=error)
+            self.render_edit(post_id=post_id, subject=subject, content=content, error=error)
