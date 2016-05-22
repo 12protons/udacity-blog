@@ -43,13 +43,11 @@ class WelcomeHandler(blog.BlogHandler):
         self.render("welcome.html", username=username)
 
     def get(self):
+        self.redirect_if_not_logged_in()
+
         user_id = self.read_cookie('name')
-        if user_id:
-            username = models.User.get_by_id(int(user_id)).username
-        if username:
-            self.render_welcome(username=username)
-        else:
-            self.redirect("/blog/signup")
+        username = models.User.get_by_id(int(user_id)).username
+        self.render_welcome(username=username)
 
 class LoginHandler(blog.BlogHandler):
     def render_login(self, error=""):
@@ -70,7 +68,7 @@ class LoginHandler(blog.BlogHandler):
             self.render_login(error="Invalid password!")
 
         user_id = str(existing_user.key().id())
-        self.write_cookie('name', user_id)
+        self.write_cookie("name", user_id)
 
         self.redirect("/blog/welcome")
 
