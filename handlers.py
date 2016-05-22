@@ -3,6 +3,7 @@ import models
 from google.appengine.ext import db
 import logging
 
+
 class SignupHandler(blog.BlogHandler):
     def render_signup(self, username="", email="", error=""):
         self.render("signup.html", username=username, email=email, error=error)
@@ -20,14 +21,16 @@ class SignupHandler(blog.BlogHandler):
         if not username or not password or not verify or password != verify:
             error = "Form Error!"
 
-        existing_user = db.GqlQuery("SELECT * FROM User WHERE username = :1", username).count()
+        existing_user = db.GqlQuery(
+            "SELECT * FROM User WHERE username = :1", username).count()
         if existing_user:
             error = "User Exists!"
 
         if not error:
             password_hash = self.make_pw_hash(name=username, pw=password)
 
-            user = models.User(username=username,password_hash=password_hash,email=email)
+            user = models.User(
+                username=username, password_hash=password_hash, email=email)
             user.put()
 
             user_id = str(user.key().id())
@@ -37,6 +40,7 @@ class SignupHandler(blog.BlogHandler):
 
         else:
             self.render_signup(username=username, email=email, error=error)
+
 
 class WelcomeHandler(blog.BlogHandler):
     def render_welcome(self, username):
@@ -51,6 +55,7 @@ class WelcomeHandler(blog.BlogHandler):
         username = models.User.get_by_id(int(user_id)).username
         self.render_welcome(username=username)
 
+
 class LoginHandler(blog.BlogHandler):
     def render_login(self, error=""):
         self.render("login.html", error=error)
@@ -61,7 +66,8 @@ class LoginHandler(blog.BlogHandler):
     def post(self):
         username = self.request.get("username")
         password = self.request.get("password")
-        existing_users = db.GqlQuery("SELECT * FROM User WHERE username = :1", username)
+        existing_users = db.GqlQuery(
+            "SELECT * FROM User WHERE username = :1", username)
 
         if existing_users.count(1) == 0:
             self.render_login(error="No such user exists!")
@@ -69,7 +75,9 @@ class LoginHandler(blog.BlogHandler):
 
         existing_user = existing_users[0]
 
-        if not self.validate_pw(name=username, pw=password, h=existing_user.password_hash):
+        if not self.validate_pw(name=username,
+                                pw=password,
+                                h=existing_user.password_hash):
             self.render_login(error="Invalid password!")
             return
 
@@ -78,14 +86,17 @@ class LoginHandler(blog.BlogHandler):
 
         self.redirect("/blog/welcome")
 
+
 class LogoutHandler(blog.BlogHandler):
     def get(self):
         self.write_cookie("name", "")
         self.redirect("/blog/login")
 
+
 class NewPostHandler(blog.BlogHandler):
     def render_newblog(self, subject="", content="", error=""):
-        self.render("newpost.html", subject=subject, content=content, error=error)
+        self.render(
+            "newpost.html", subject=subject, content=content, error=error)
 
     def get(self):
         redirected = self.redirect_if_not_logged_in()
@@ -104,7 +115,10 @@ class NewPostHandler(blog.BlogHandler):
         author_id = self.logged_in()
 
         if subject and content:
-            a = models.Post(subject=subject, content=content, author=author_id, liked_by_users="")
+            a = models.Post(subject=subject,
+                            content=content,
+                            author=author_id,
+                            liked_by_users="")
             a.put()
 
             post_id = a.key().id()
@@ -114,21 +128,38 @@ class NewPostHandler(blog.BlogHandler):
             error = "need both subject and content!"
             self.render_newblog(subject=subject, content=content, error=error)
 
+
 class PostHandler(blog.BlogHandler):
-    def render_post(self, post_id, subject, content, authorname, comments, error=""):
-        self.render("post.html", post_id=post_id, subject=subject, content=content, authorname=authorname, comments=comments, error=error)
+    def render_post(self,
+                    post_id,
+                    subject,
+                    content,
+                    authorname,
+                    comments,
+                    error=""):
+
+        self.render("post.html",
+                    post_id=post_id,
+                    subject=subject,
+                    content=content,
+                    authorname=authorname,
+                    comments=comments,
+                    error=error)
 
     def get(self, post_id):
         post = models.Post.get_by_id(int(post_id))
         subject = post.subject
         content = post.content
-        
+
         author_id = post.author
         author = models.User.get_by_id(int(author_id))
 
-        comments = db.GqlQuery("SELECT * FROM Comment WHERE post_id = :1", post_id)
+        comments = db.GqlQuery(
+            "SELECT * FROM Comment WHERE post_id = :1", post_id)
 
-        self.render_post(post_id=post_id, subject=subject, content=content, comments=comments, authorname=author.username)
+        self.render_post(post_id=post_id, subject=subject,
+                         content=content, comments=comments,
+                         authorname=author.username)
 
     def post(self, post_id):
         redirected = self.redirect_if_not_logged_in()
@@ -138,7 +169,8 @@ class PostHandler(blog.BlogHandler):
         user_id = self.logged_in()
         comment_content = self.request.get("comment")
         if comment_content:
-            comment = models.Comment(user_id=user_id, post_id=post_id, content=comment_content)
+            comment = models.Comment(user_id=user_id, post_id=post_id,
+                                     content=comment_content)
             comment.put()
             self.redirect("/blog/%s" % post_id)
         else:
@@ -147,11 +179,13 @@ class PostHandler(blog.BlogHandler):
             post = models.Post.get_by_id(int(post_id))
             subject = post.subject
             content = post.content
-            
+
             author_id = post.author
             author = models.User.get_by_id(int(author_id))
 
-            self.render_post(subject=subject, content=content, authorname=author.username, error=error)
+            self.render_post(subject=subject, content=content,
+                             authorname=author.username, error=error)
+
 
 class HomeHandler(blog.BlogHandler):
     def render_blog(self, posts):
@@ -161,9 +195,11 @@ class HomeHandler(blog.BlogHandler):
         posts = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC")
         self.render_blog(posts)
 
+
 class EditPostHandler(blog.BlogHandler):
     def render_edit(self, post_id, subject, content, error=""):
-        self.render("editpost.html", post_id=post_id, subject=subject, content=content, error=error)
+        self.render("editpost.html", post_id=post_id, subject=subject,
+                    content=content, error=error)
 
     def get(self, post_id):
         redirected = self.redirect_if_not_logged_in()
@@ -195,7 +231,9 @@ class EditPostHandler(blog.BlogHandler):
             self.redirect("/blog/%s" % post_id)
         else:
             error = "need both subject and content!"
-            self.render_edit(post_id=post_id, subject=subject, content=content, error=error)
+            self.render_edit(post_id=post_id, subject=subject,
+                             content=content, error=error)
+
 
 class DeletePostHandler(blog.BlogHandler):
     def get(self, post_id):
@@ -207,6 +245,7 @@ class DeletePostHandler(blog.BlogHandler):
         post = models.Post.get_by_id(int(post_id))
         db.delete(post)
         self.redirect("/blog")
+
 
 class LikePostHandler(blog.BlogHandler):
     def get(self, post_id):
@@ -222,9 +261,11 @@ class LikePostHandler(blog.BlogHandler):
 
         self.redirect("/blog")
 
+
 class EditCommentHandler(blog.BlogHandler):
     def render_edit(self, post_id, comment_id, content, error=""):
-        self.render("editcomment.html", post_id=post_id, comment_id=comment_id, content=content, error=error)
+        self.render("editcomment.html", post_id=post_id,
+                    comment_id=comment_id, content=content, error=error)
 
     def get(self, post_id, comment_id):
         redirected = self.redirect_if_not_logged_in()
@@ -249,8 +290,9 @@ class EditCommentHandler(blog.BlogHandler):
             comment.put()
             self.redirect("/blog/%s" % post_id)
         else:
-            error="You cant have empty comments!"
+            error = "You cant have empty comments!"
             self.render_edit(post_id, comment_id, comment.content)
+
 
 class DeleteCommentHandler(blog.BlogHandler):
     def get(self, post_id, comment_id):

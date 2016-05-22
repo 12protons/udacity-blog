@@ -7,24 +7,31 @@ import hmac
 import models
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
-                               autoescape = True)
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
+                               autoescape=True)
+
 
 # Crypto
 SECRET = 'imsosecret'
+
+
 def hash_str(s):
     return hmac.new(SECRET, s).hexdigest()
 
+
 def make_secure_val(s):
     return "%s|%s" % (s, hash_str(s))
+
 
 def check_secure_val(h):
     val = h.split('|')[0]
     if h == make_secure_val(val):
         return val
 
+
 def make_salt():
     return ''.join(random.choice(string.letters) for x in xrange(5))
+
 
 # Base Handler
 class BlogHandler(webapp2.RequestHandler):
@@ -48,7 +55,8 @@ class BlogHandler(webapp2.RequestHandler):
     def write_cookie(self, cookie_name, cookie_value):
         if cookie_value:
             cookie_value = make_secure_val(cookie_value)
-        self.response.headers.add_header('Set-Cookie', '%s=%s; Path=/' % (cookie_name, cookie_value))
+        self.response.headers.add_header(
+            'Set-Cookie', '%s=%s; Path=/' % (cookie_name, cookie_value))
 
     def read_cookie(self, cookie_name):
         cookie_secure_value = self.request.cookies.get(cookie_name)
@@ -59,7 +67,7 @@ class BlogHandler(webapp2.RequestHandler):
 
         return cookie_value
 
-    def make_pw_hash(self, name, pw, salt = None):
+    def make_pw_hash(self, name, pw, salt=None):
         if not salt:
             salt = make_salt()
         h = hash_str(name + pw + salt)
